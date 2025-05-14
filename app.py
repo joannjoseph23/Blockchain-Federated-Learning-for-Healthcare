@@ -3,6 +3,7 @@ import pickle
 import os
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 from blockchain import Blockchain
 from crypto_utils import decrypt_data, verify_node
 
@@ -39,16 +40,30 @@ if st.sidebar.button("Query Blockchain"):
     if results:
         all_weights = []
         for r in results:
-            st.success(f"Node {r['node']}: {r['weights']}")
-            all_weights.append(np.array(r['weights']))
+            # Create a dataframe to display the decrypted weights
+            node_name = r['node']
+            weights = r['weights']
+            weight_df = pd.DataFrame(weights, columns=[f'Feature {i+1}' for i in range(len(weights[0]))])
+            st.subheader(f"Model Weights from Node {node_name}")
+            st.write(weight_df)
+
+            all_weights.append(np.array(weights))
 
         # Federated averaging
         global_weights = np.mean(all_weights, axis=0)
         st.subheader("🌐 Federated Averaged Weights")
         st.code(global_weights.tolist())
 
-        # Visualize with a DataFrame
-        df = pd.DataFrame(global_weights, columns=[f'Feature {i+1}' for i in range(global_weights.shape[1])])
-        st.bar_chart(df.T)
+        # Visualize with a DataFrame (Bar Chart)
+        weight_df_global = pd.DataFrame(global_weights, columns=[f'Feature {i+1}' for i in range(global_weights.shape[1])])
+        st.bar_chart(weight_df_global.T)
+
+        # Optionally: Add a heatmap to visualize weight differences
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.imshow(global_weights, cmap='coolwarm', aspect='auto')
+        ax.set_title("Global Model Weights (Heatmap)")
+        ax.set_xticks(np.arange(global_weights.shape[1]))
+        ax.set_xticklabels([f'Feature {i+1}' for i in range(global_weights.shape[1])])
+        st.pyplot(fig)
     else:
         st.warning("No valid results found for the selected species.")
