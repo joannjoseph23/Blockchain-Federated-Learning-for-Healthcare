@@ -1,5 +1,7 @@
 import hashlib
 import json
+import time
+
 from crypto_utils import decrypt_data, verify_node
 
 class Block:
@@ -8,6 +10,8 @@ class Block:
         self.previous_hash = previous_hash
         self.nonce = self.proof_of_work()
         self.hash = self.compute_hash()
+        self.timestamp = time.time()  # ⬅️ Add this line
+
 
     def compute_hash(self):
         block_string = json.dumps(self.__dict__, sort_keys=True)

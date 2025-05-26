@@ -5,7 +5,8 @@ from crypto_utils import encrypt_data
 class HospitalNode:
     def __init__(self, name):
         self.name = name
-        seed = 42 if name == 'A' else 99
+        # Unique seed for different hospitals
+        seed = 42 + ord(name)
         self.X, self.y = load_hospital_data(seed)
 
     def train_model(self):
@@ -16,6 +17,8 @@ class HospitalNode:
 
         return {
             'node': self.name,
-            'species': 'setosa',  # Optional: update if using another label
+            'species': 'breast-cancer',
+            'weights': weights,
+            'key': f'hospital_{self.name.lower()}.pem',
             'encrypted_data': encrypted_weights
         }

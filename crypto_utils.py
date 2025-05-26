@@ -93,4 +93,4 @@ def decrypt_data(payload_json, privkey_path):
     return json.loads(data.decode())
 
 def verify_node(node):
-    return node in ['A', 'B']
+    return node in [chr(i) for i in range(ord('A'), ord('Z')+1)]  # Accepts A–Z
